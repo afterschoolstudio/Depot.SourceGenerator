@@ -6,3 +6,9 @@ Depot.SourceGenerator/bin/
 Depot.SourceGenerator/obj/
 
 Depot.SourceGenerator.Tests/obj/
+
+Depot.SourceGenerator.Sample/bin/
+
+Depot.SourceGenerator.Sample/obj/
+
+Depot.SourceGenerator.Sample/Generated/

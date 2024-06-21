@@ -8,9 +8,14 @@
 
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <!-- <IncludeBuildOutput>false</IncludeBuildOutput> -->
 
         <RootNamespace>Depot.SourceGenerator</RootNamespace>
         <PackageId>Depot.SourceGenerator</PackageId>
+        <Version>1.0.5</Version>
+        <Authors>Kyle Kukshtel</Authors>
+        <Company>Afterschool Studio</Company>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,5 +28,12 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- Package the generator in the analyzer directory of the nuget package -->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+        <!-- Package the props file -->
+        <None Include="Depot.SourceGenerator.props" Pack="true" PackagePath="build" Visible="false" />
+    </ItemGroup>
 
 </Project>
