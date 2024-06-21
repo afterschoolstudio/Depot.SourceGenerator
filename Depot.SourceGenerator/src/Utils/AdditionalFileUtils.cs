@@ -7,7 +7,7 @@ public static class AdditionalFileUtils
 {
     //https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#access-analyzer-config-properties
     //https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#consume-msbuild-properties-and-metadata
-    public static IEnumerable<(bool, AdditionalText)> GetLoadOptions(GeneratorExecutionContext context)
+    public static IEnumerable<(bool generateDepotSource, AdditionalText text)> GetLoadOptions(GeneratorExecutionContext context)
     {
         //this basically searches to see if we want to actually generate depot source for a file
         //could also add in other options here

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.IO;
 using Microsoft.CodeAnalysis;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -23,7 +24,7 @@ namespace Depot.SourceGenerator
 
         public static LineData GetLineDataFromGUID(ColumnData d, string lineGuid)
         {
-            var sheetguid = d.JsonElement.GetProperty("sheet").ToString(); //this is the configured column data field that points to the sheet the line refs come from. every lineref has it
+            var sheetguid = (d.JObject["sheet"] as JProperty).Value<string>(); //this is the configured column data field that points to the sheet the line refs come from. every lineref has it
             return GetSheetDataFromGUID(d,sheetguid).Lines.Find(x => x.GUID == lineGuid);
         }
         public static string GetLineNameFromGUID(ColumnData d, string lineGuid)
@@ -32,7 +33,7 @@ namespace Depot.SourceGenerator
         }
         public static string GetLineDataPathFromGuid(LineData configuringLine, ColumnData d, string lineguid)
         {
-            var sheetguid = d.JsonElement.GetProperty("sheet").ToString(); //this is the configured column data field that points to the sheet the line refs come from. every lineref has it
+            var sheetguid = (d.JObject["sheet"] as JProperty).Value<string>(); //this is the configured column data field that points to the sheet the line refs come from. every lineref has it
             if(string.IsNullOrEmpty(lineguid))
             {
                 //no line has been selected, return null

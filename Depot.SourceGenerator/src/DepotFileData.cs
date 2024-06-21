@@ -1,6 +1,6 @@
 using System.Linq;
-using System.Text.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -11,22 +11,22 @@ namespace Depot.SourceGenerator
         public List<SheetData> Sheets {get; protected set;}
         public string FileText {get; protected set;}
         public Dictionary<SheetData,List<SubsheetData>> SubsheetTree {get; protected set;}
-        public DepotFileData(string fileName, string allText, JsonElement root)
+        public DepotFileData(string fileName, string allText, JObject root)
         {
             RawFileName = fileName;
             WriteSafeName = File.SanitizeFilename(RawFileName);
             FileText = allText;
             Sheets = new List<SheetData>();
-            var enumeratedSheets = root.GetProperty("sheets").EnumerateArray();
+            var enumeratedSheets = root["sheets"] as JArray;
             //create the parent sheets first
-            foreach (var sheet in enumeratedSheets.Where(x => !x.GetProperty("hidden").GetBoolean()))
+            foreach (var sheet in enumeratedSheets.Where(x => !x["hidden"].Value<bool>()))
             {
-                SheetData sheetData = new SheetData(sheet,this);
+                SheetData sheetData = new SheetData(sheet as JObject,this);
                 Sheets.Add(sheetData);
             }
-            foreach (var sheet in enumeratedSheets.Where(x => x.GetProperty("hidden").GetBoolean()))
+            foreach (var sheet in enumeratedSheets.Where(x => x["hidden"].Value<bool>()))
             {
-                SubsheetData sheetData = new SubsheetData(sheet,this);
+                SubsheetData sheetData = new SubsheetData(sheet as JObject,this);
                 Sheets.Add(sheetData);
             }
             foreach (var sheet in Sheets.Where(x => !(x is SubsheetData)))
@@ -70,7 +70,7 @@ namespace Depot.SourceGenerator
         {
             if(!(s is SubsheetData)){return s.Name;}
             var b = "";
-            var parent = Sheets.Find(x => x.GUID == s.JsonElement.GetProperty("parentSheetGUID").ToString());
+            var parent = Sheets.Find(x => x.GUID == s.JObject["parentSheetGUID"].Value<string>());
             b += $"{GetPathToSheet(parent)}.";
             b += s.IsProps ? $"{s.Name}Props" : $"{s.Name}List"; //only subsheets are props and lists
             return b;

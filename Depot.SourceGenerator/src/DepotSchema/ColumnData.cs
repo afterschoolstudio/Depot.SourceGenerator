@@ -1,7 +1,7 @@
 using System;
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -10,16 +10,16 @@ namespace Depot.SourceGenerator
         public string Name {get;}
         public string RawName {get;}
         public string GUID {get;}
-        public JsonElement JsonElement { get;}
+        public JObject JObject { get;}
         public SheetData ParentSheet {get;}
         public DepotFileData ParentFile => ParentSheet.ParentDepotFile;
-        public ColumnData(JsonElement e, SheetData parentSheet)
+        public ColumnData(JObject e, SheetData parentSheet)
         {
-            JsonElement = e;
+            JObject = e;
             ParentSheet = parentSheet;
-            RawName = e.GetProperty("name").GetString();
+            RawName = e["name"].Value<string>();
             Name = File.SanitizeFilename(RawName);
-            GUID = e.GetProperty("guid").GetString();
+            GUID = e["guid"].Value<string>();
         }
         /// <summary>
         /// This type is used to build the constructors for a type

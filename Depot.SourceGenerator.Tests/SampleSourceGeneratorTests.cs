@@ -16,7 +16,7 @@ Customer";
     public void GenerateClassesBasedOnDDDRegistry()
     {
         // Create an instance of the source generator.
-        var generator = new SampleSourceGenerator();
+        var generator = new GeneratorEntry();
 
         // Source generators should be tested using 'GeneratorDriver'.
         var driver = CSharpGeneratorDriver.Create(new[] { generator },

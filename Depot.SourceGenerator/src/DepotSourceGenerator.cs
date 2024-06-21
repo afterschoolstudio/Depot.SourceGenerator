@@ -1,16 +1,12 @@
 using System;
-using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 
 namespace Depot.SourceGenerator
@@ -41,19 +37,17 @@ namespace Depot.SourceGenerator
         {
             var depotFileName = Path.GetFileNameWithoutExtension(a.Path);
             var depotFileText = a.GetText().ToString();
-            using (JsonDocument document = JsonDocument.Parse(depotFileText))
+            var document = JObject.Parse(depotFileText);
+            var DepotFileData = new DepotFileData(depotFileName,depotFileText,document);
+            foreach (var sheet in DepotFileData.Sheets.Where(x => !(x is SubsheetData)))
             {
-                var DepotFileData = new DepotFileData(depotFileName,depotFileText,document.RootElement);
-                foreach (var sheet in DepotFileData.Sheets.Where(x => !(x is SubsheetData)))
-                {
-                    var cw = new Utils.CodeWriter();
-                    cw.AddLine("using System.IO;");
-                    cw.AddLine("using Depot.Core;");
-                    cw.OpenScope($"namespace Depot.Generated.{DepotFileData.WriteSafeName}");
-                    BuildSheet(cw,sheet);
-                    cw.CloseScope();
-                    context.AddSource($"{depotFileName}.{sheet.Name}", cw.ToString());
-                }
+                var cw = new Utils.CodeWriter();
+                cw.AddLine("using System.IO;");
+                cw.AddLine("using Depot.Core;");
+                cw.OpenScope($"namespace Depot.Generated.{DepotFileData.WriteSafeName}");
+                BuildSheet(cw,sheet);
+                cw.CloseScope();
+                context.AddSource($"{depotFileName}.{sheet.Name}", cw.ToString());
             }
         }
         
@@ -221,28 +215,6 @@ public class {sheet.Name}LineReference
 }}
 ";
             cw.AddLines(source);
-            //
-            // cw.OpenScope($"public class {sheet.WriteSafeName}LineReference");
-            //     cw.AddLine("public string LineGuid {get; protected set;}");
-            //     cw.AddLine($"{sheet.WriteSafeName}.{sheet.WriteSafeName}Line line;");
-            //     cw.OpenScope($"public {sheet.WriteSafeName}.{sheet.WriteSafeName}Line Line");
-            //         cw.OpenScope($"get");
-            //             cw.OpenScope($"if(line == null)");
-            //                 cw.AddLine($"SetupReference();");
-            //             cw.CloseScope();
-            //             cw.AddLine("return line;");
-            //         cw.CloseScope();
-            //         cw.OpenScope($"set");
-            //             cw.AddLine("line = value;");
-            //         cw.CloseScope();
-            //     cw.CloseScope();
-            //     cw.OpenScope($"public {sheet.WriteSafeName}LineReference(string guid)");
-            //         cw.AddLine($"LineGuid = guid;");
-            //     cw.CloseScope();
-            //     cw.OpenScope("void SetupReference()");
-            //         cw.AddLine($"Line = {sheet.WriteSafeName}.Lines.Find(x => x.GUID == LineGuid);");
-            //     cw.CloseScope();
-            // cw.CloseScope();
         }
 
         static void BuildSheetLines(Utils.CodeWriter cw, SheetData sheet) //NOTE: only top line sheets have this
@@ -255,10 +227,10 @@ public class {sheet.Name}LineReference
                         {"id",line.ID},
                         {"guid",line.GUID}
                     };
-                    foreach (var prop in line.JsonElement.EnumerateObject())
+                    foreach (var token in line.JObject)
                     {
-                        if(prop.NameEquals("id") || prop.NameEquals("guid")){continue;}
-                        lineValueDict.Add(prop.Name,prop.Value);
+                        if(token.Key == "id" || token.Key == "guid"){continue;}
+                        lineValueDict.Add(token.Key,token.Value.Value<object>());
                     }
                     var lineValues = new List<string>();
                     foreach (var item in lineValueDict.OrderBy(x=>x.Key))

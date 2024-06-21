@@ -1,7 +1,7 @@
 using System;
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -14,23 +14,23 @@ namespace Depot.SourceGenerator
         public bool Hidden {get;}
         public bool IsProps {get;}
         public DepotFileData ParentDepotFile {get;}
-        public JsonElement JsonElement {get;}
+        public JObject JObject {get;}
         public List<LineData> Lines {get; protected set;}
         public List<ColumnData> Columns {get; protected set;}
         public string DataPath => ParentDepotFile.GetPathToSheet(this);
-        public SheetData(JsonElement e, DepotFileData parentDepotFile)
+        public SheetData(JObject e, DepotFileData parentDepotFile)
         {
-            JsonElement = e;
+            JObject = e;
             ParentDepotFile = parentDepotFile;
-            RawName = e.GetProperty("name").GetString();
+            RawName = e["name"].Value<string>();
             Name = File.SanitizeFilename(RawName);
-            Description = e.GetProperty("description").GetString();
-            GUID = e.GetProperty("guid").GetString();
-            Hidden = e.GetProperty("hidden").GetBoolean();
+            Description = e["description"].Value<string>();
+            GUID = e["guid"].Value<string>();
+            Hidden = e["hidden"].Value<bool>();
             IsProps = false; //old sheets dont have this already defined (but those sheets were also never props)
-            if(e.TryGetProperty("isProps", out var p))
+            if(e["isProps"].HasValues)
             {
-                IsProps = p.GetBoolean();
+                IsProps = e["isProps"].Value<bool>();
             }
         }
 
@@ -43,10 +43,10 @@ namespace Depot.SourceGenerator
             {
                 Columns.Add(new Id(this));
             }
-            foreach (var column in JsonElement.GetProperty("columns").EnumerateArray())
+            foreach (var column in JObject["columns"])
             {
-                var type = DepotSourceGenerator.DepotTypeDict[column.GetProperty("typeStr").ToString()];
-                var cd = (ColumnData) Activator.CreateInstance(type,column,this);
+                var type = DepotSourceGenerator.DepotTypeDict[column["typeStr"].Value<string>()];
+                var cd = (ColumnData) Activator.CreateInstance(type,column as JObject,this);
                 Columns.Add(cd);
             }
 
@@ -56,9 +56,9 @@ namespace Depot.SourceGenerator
         public void InitLines()
         {
             Lines = new List<LineData>();
-            foreach (var line in JsonElement.GetProperty("lines").EnumerateArray())
+            foreach (var line in JObject["lines"])
             {
-                Lines.Add(new LineData(line,this));
+                Lines.Add(new LineData(line as JObject,this));
             }
         }
     }
@@ -67,10 +67,10 @@ namespace Depot.SourceGenerator
     {
         public string ParentSheetGUID {get;}
         public string ColumnGUID {get;}
-        public SubsheetData(JsonElement e, DepotFileData d) : base(e,d)
+        public SubsheetData(JObject e, DepotFileData d) : base(e,d)
         {
-            ParentSheetGUID = e.GetProperty("parentSheetGUID").GetString();
-            ColumnGUID = e.GetProperty("columnGUID").GetString();
+            ParentSheetGUID = e["parentSheetGUID"].Value<string>();
+            ColumnGUID = e["columnGUID"].Value<string>();
         }
 
     }
