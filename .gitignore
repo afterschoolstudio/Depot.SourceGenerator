@@ -1,0 +1,8 @@
+
+.idea/
+
+Depot.SourceGenerator/bin/
+
+Depot.SourceGenerator/obj/
+
+Depot.SourceGenerator.Tests/obj/
