@@ -1,0 +1,32 @@
+{
+    "sheets": [
+        {
+            "name": "newSheet",
+            "description": "description of what the sheet is",
+            "displayColumn": "id",
+            "guid": "b06637c6-2cca-42da-b7c3-b4bf06041d1b",
+            "columns": [],
+            "lines": [
+                {
+                    "guid": "b649cf44-d592-4810-a802-434681bd9c9c",
+                    "id": "0"
+                }
+            ],
+            "hidden": false,
+            "isProps": false,
+            "configurable": {
+                "name": "text",
+                "description": "text",
+                "displayColumn": "columnSelect@name",
+                "columnSelect@name@displayColumn": {
+                    "allowedTypes": [
+                        "int",
+                        "float",
+                        "text",
+                        "longtext"
+                    ]
+                }
+            }
+        }
+    ]
+}

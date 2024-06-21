@@ -1,7 +1,7 @@
 using System;
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 
 namespace Depot.SourceGenerator
@@ -12,13 +12,24 @@ namespace Depot.SourceGenerator
         public override string GetValue(LineData configuringLine, object o)
         {
             var value = o.ToString();
-            return (!string.IsNullOrEmpty(value) && ((JsonElement)o).EnumerateArray().Count() > 0 && !string.IsNullOrEmpty(((JsonElement)o).EnumerateArray().First().ToString())) ? string.Join("|",((JsonElement)o).EnumerateArray().Select(x => $"{ParentSheet.DataPath}.{CSharpType}.{x}")) : $"{ParentSheet.DataPath}.{CSharpType}.None";
+            if( !string.IsNullOrEmpty(value) && 
+                ((JArray)o).HasValues && 
+                !string.IsNullOrEmpty(((JArray)o).First.Value<string>()))
+                {
+                    var cat = new List<string>();
+                    foreach (var item in (JArray)o)
+                    {
+                        cat.Add($"{ParentSheet.DataPath}.{CSharpType}.{item.Value<string>()}");
+                    }
+                    return string.Join("|",cat);
+                }
+            return $"{ParentSheet.DataPath}.{CSharpType}.None";
         }
-        public Multiple(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public Multiple(JObject e, SheetData parentSheet) : base(e,parentSheet){}
         public void BuildType(Utils.CodeWriter cw, SheetData d)
         {
             var index = 0;
-            var enumValues = JsonElement.GetProperty("options").GetString().Split(',').ToList();
+            var enumValues = JObject["options"].Value<string>().Split(',').ToList();
             cw.AddLine($"[Flags]");
             cw.OpenScope($"public enum {CSharpType}");
             List<string> lines = new List<string>();

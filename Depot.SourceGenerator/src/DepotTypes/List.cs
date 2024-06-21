@@ -1,6 +1,6 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -10,15 +10,15 @@ namespace Depot.SourceGenerator
         public override string GetValue(LineData configuringLine, object o)
         {
             var value = o.ToString();
-            return !string.IsNullOrEmpty(value) ? BuildListCtor(configuringLine,value,JsonElement.GetProperty("sheet").ToString(),this) : "null"; //todo - this is a line constructor for the subsheet typ;
+            return !string.IsNullOrEmpty(value) ? BuildListCtor(configuringLine,value,JObject["sheet"].Value<string>(),this) : "null"; //todo - this is a line constructor for the subsheet typ;
         }
         string handleListReference()
         {
-            var sheetGUID = JsonElement.GetProperty("sheet").ToString();
+            var sheetGUID = JObject["sheet"].Value<string>();
             var path = ParentSheet.ParentDepotFile.GetPathToSheet(Utils.GetSheetDataFromGUID(this,sheetGUID));
             return $"List<{path}.{Utils.GetSheetTypeNameFromGUID(this,sheetGUID)}ListLine>";
         }
-        public List(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public List(JObject e, SheetData parentSheet) : base(e,parentSheet){}
 
         public string BuildListCtor(LineData configuringLine, string v, string listSheetGuid, ColumnData parentColumn)
         {
@@ -26,34 +26,34 @@ namespace Depot.SourceGenerator
             var sheet = Utils.GetSheetDataFromGUID(this,listSheetGuid);
             var path = ParentSheet.ParentDepotFile.GetPathToSheet(sheet);
             var listItemTypePath = $"{path}.{sheet.Name}ListLine";
-            var data = JsonDocument.Parse(v);
-            if(data.RootElement.EnumerateArray().Count() == 0){return "null";}
-            foreach (var e in data.RootElement.EnumerateArray()) //this is the array of lines at this element
+            var data = JArray.Parse(v);
+            if(!data.HasValues){return "null";}
+            foreach (var e in data) //this is the array of lines at this element
             {
-                var s = e.ToString();
                 var listValues = new List<string>();
                 var reqColumns = new List<ColumnData>(sheet.Columns);
                 //depot kvp value placement is indeterminat,so we just alphabetize here
-                foreach (var l in e.EnumerateObject().OrderBy(x => x.Name)) //these are the actual values in the array
+                foreach (var l in e.OrderBy(x => ((JProperty)x).Name)) //these are the actual values in the array
                 {
-                    var typeColumn = sheet.Columns.Find(x => x.RawName == l.Name);
+                    var prop = (JProperty)l;
+                    var typeColumn = sheet.Columns.Find(x => x.RawName == prop.Name);
                     if(typeColumn == null)
                     {
                         //no line has been selected, return null
-                        DepotSourceGenerator.Logs.Add($"WARN: unable to find matching column for line data key {l.Name} with value {l.Value} on line with id {configuringLine.ID}, data will not be reflected in source");
+                        DepotSourceGenerator.Logs.Add($"WARN: unable to find matching column for line data key {prop.Name} with value {prop.Value.Value<string>()} on line with id {configuringLine.ID}, data will not be reflected in source");
                         continue;
                     }
                     if(typeColumn is Props p)
                     {
-                        listValues.Add(p.BuildPropsCtor(configuringLine,l.Value.ToString(),typeColumn.JsonElement.GetProperty("sheet").ToString(),this));
+                        listValues.Add(p.BuildPropsCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
                     }
                     else if(typeColumn is List li)
                     {
-                        listValues.Add(li.BuildListCtor(configuringLine,l.Value.ToString(),typeColumn.JsonElement.GetProperty("sheet").ToString(),this));
+                        listValues.Add(li.BuildListCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
                     }
                     else
                     {
-                        listValues.Add(typeColumn.GetValue(configuringLine,l.Value));
+                        listValues.Add(typeColumn.GetValue(configuringLine,prop.Value.Value<object>()));
                     }
                     reqColumns.Remove(typeColumn);
                 }

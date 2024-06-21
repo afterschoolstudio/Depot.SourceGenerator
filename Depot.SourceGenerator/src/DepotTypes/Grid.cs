@@ -1,7 +1,7 @@
 using System;
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 
 namespace Depot.SourceGenerator
@@ -16,13 +16,13 @@ namespace Depot.SourceGenerator
         }
         string handlePropsReference()
         {
-            var sheetGUID = JsonElement.GetProperty("sheet").ToString();
+            var sheetGUID = JObject["sheet"].Value<string>();
             return ParentSheet.ParentDepotFile.GetPathToSheet(Utils.GetSheetDataFromGUID(this,sheetGUID));
         }
         List<ColumnData> SpoofedSchemaColumns = new List<ColumnData>();
-        public Grid(JsonElement e, SheetData parentSheet) : base(e,parentSheet)
+        public Grid(JObject e, SheetData parentSheet) : base(e,parentSheet)
         {
-            var schema = JsonElement.GetProperty("schema").EnumerateArray().Select(x => x.ToString()).ToArray();
+            var schema = (JObject["schema"] as JArray).Select(x => x.ToString()).ToArray();
             for (int i = 0; i < schema.Count(); i++)
             {
                 var sc = new HiddenDataType.SpoofedColumnData($"v{i}");
@@ -34,7 +34,7 @@ namespace Depot.SourceGenerator
         public string BuildGridCtor(LineData configuringLine, string v)
         {
             var values = new List<string>();
-            var data = JsonDocument.Parse(v).RootElement.EnumerateArray().Select(x => x.ToString()).ToArray();
+            var data = JArray.Parse(v).Select(x => x.ToString()).ToArray();
             for (int i = 0; i < SpoofedSchemaColumns.Count(); i++)
             {
                 values.Add(SpoofedSchemaColumns[i].GetValue(configuringLine,data[i]));
@@ -44,7 +44,6 @@ namespace Depot.SourceGenerator
         public void BuildType(Utils.CodeWriter cw, SheetData d)
         {
             cw.OpenScope($"public class {CSharpType}");
-            var schema = JsonElement.GetProperty("schema").EnumerateArray();
             var schemaTypeDict = new Dictionary<int,string>();
             var index = 0;
             List<string> valueNames = new List<string>();

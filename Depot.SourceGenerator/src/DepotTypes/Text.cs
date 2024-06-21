@@ -1,6 +1,6 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -12,6 +12,6 @@ namespace Depot.SourceGenerator
             var value = o.ToString();
             return string.Format(@"""{0}""",value);
         }
-        public Text(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public Text(JObject e, SheetData parentSheet) : base(e,parentSheet){}
     }
 }

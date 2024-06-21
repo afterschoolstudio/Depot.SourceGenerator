@@ -1,6 +1,6 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -12,6 +12,6 @@ namespace Depot.SourceGenerator
             var value = o.ToString();
             return !string.IsNullOrEmpty(value) ? "new FileInfo(" + string.Format(@"""{0}""",value.Replace("\\","/")) + ")" : "null"; //todo - byte[];
         }
-        public FileColumn(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public FileColumn(JObject e, SheetData parentSheet) : base(e,parentSheet){}
     }
 }

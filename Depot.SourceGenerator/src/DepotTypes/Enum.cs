@@ -1,6 +1,6 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -12,11 +12,11 @@ namespace Depot.SourceGenerator
             var value = o.ToString();
             return $"{ParentSheet.DataPath}.{CSharpType}.{value}";
         }
-        public Enum(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public Enum(JObject e, SheetData parentSheet) : base(e,parentSheet){}
         public void BuildType(Utils.CodeWriter cw, SheetData d)
         {
             var enumValues = new List<string>();
-            enumValues.AddRange(JsonElement.GetProperty("options").GetString().Split(',').ToList());
+            enumValues.AddRange(JObject["options"].Value<string>().Split(',').ToList());
             if(!enumValues.Contains("None"))
             {
                 enumValues.Insert(0,"None");

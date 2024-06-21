@@ -1,6 +1,6 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -10,43 +10,48 @@ namespace Depot.SourceGenerator
         public override string GetValue(LineData configuringLine, object o)
         {
             var value = o.ToString();
-            return !string.IsNullOrEmpty(value) ? BuildPropsCtor(configuringLine,value,JsonElement.GetProperty("sheet").ToString(),this) : "null"; //todo - this is just an object sonstructo;
+            return !string.IsNullOrEmpty(value) ? BuildPropsCtor(configuringLine,value,JObject["sheet"].Value<string>(),this) : "null"; //todo - this is just an object sonstructo;
         }
         string handlePropsReference()
         {
-            var sheetGUID = JsonElement.GetProperty("sheet").ToString();
+            var sheetGUID = JObject["sheet"].Value<string>();
             return ParentSheet.ParentDepotFile.GetPathToSheet(Utils.GetSheetDataFromGUID(this,sheetGUID));
         }
-        public Props(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public Props(JObject e, SheetData parentSheet) : base(e,parentSheet){}
         public string BuildPropsCtor(LineData configuringLine, string v, string propsSheetGuid, ColumnData parentColumn)
         {
             var values = new List<string>();
             var sheet = Utils.GetSheetDataFromGUID(this,propsSheetGuid);
             var path = ParentSheet.ParentDepotFile.GetPathToSheet(sheet);
-            var data = JsonDocument.Parse(v);
-            if(data.RootElement.EnumerateObject().Count() == 0){return "null";}
+            var data = JObject.Parse(v);
+            if(!data.HasValues){return "null";}
             var reqColumns = new List<ColumnData>(sheet.Columns);
-            foreach (var e in data.RootElement.EnumerateObject().OrderBy(x=>x.Name))
+            foreach (var e in data.Values().OrderBy(x=>((JProperty)x).Name))
             {
-                if(e.NameEquals("guid")){values.Add(string.Format(@"""{0}""",e.Value));continue;}
-                var typeColumn = sheet.Columns.Find(x => x.RawName == e.Name);
+                var prop = (JProperty)e;
+                if(prop.Name == "guid")
+                {
+                    values.Add(string.Format(@"""{0}""",((JProperty)e).Value));
+                    continue;
+                }
+                var typeColumn = sheet.Columns.Find(x => x.RawName == prop.Name);
                 if(typeColumn == null)
                 {
                     //no line has been selected, return null
-                    DepotSourceGenerator.Logs.Add($"WARN: unable to find matching column for line data key {e.Name} with value {e.Value} on line with id {configuringLine.ID}, data will not be reflected in source");
+                    DepotSourceGenerator.Logs.Add($"WARN: unable to find matching column for line data key {prop.Name} with value {prop.Value.Value<string>()} on line with id {configuringLine.ID}, data will not be reflected in source");
                     continue;
                 }
                 if(typeColumn is Props p)
                 {
-                    values.Add(p.BuildPropsCtor(configuringLine,e.Value.ToString(),typeColumn.JsonElement.GetProperty("sheet").ToString(),this));
+                    values.Add(p.BuildPropsCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
                 }
                 else if(typeColumn is List li)
                 {
-                    values.Add(li.BuildListCtor(configuringLine,e.Value.ToString(),typeColumn.JsonElement.GetProperty("sheet").ToString(),this));
+                    values.Add(li.BuildListCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
                 }
                 else
                 {
-                    values.Add(typeColumn.GetValue(configuringLine,e.Value));
+                    values.Add(typeColumn.GetValue(configuringLine,prop.Value.Value<string>()));
                 }
                 reqColumns.Remove(typeColumn);
             }

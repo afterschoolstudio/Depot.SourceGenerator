@@ -1,6 +1,6 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
@@ -8,7 +8,7 @@ namespace Depot.SourceGenerator
     {
         public override string CSharpType => handleLineReference();
         public string ReferenceLineType => getReferencedLineType();
-        public SheetData ReferencedLineParentSheet => Utils.GetSheetDataFromGUID(this,JsonElement.GetProperty("sheet").ToString());
+        public SheetData ReferencedLineParentSheet => Utils.GetSheetDataFromGUID(this,JObject["sheet"].Value<string>());
         public override string GetValue(LineData configuringLine, object o)
         {
             var lineguid = o.ToString();
@@ -23,6 +23,6 @@ namespace Depot.SourceGenerator
             var path = ParentFile.GetPathToSheet(ReferencedLineParentSheet);
             return $"{path}.{ReferencedLineParentSheet.Name}Line";
         }
-        public LineReference(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public LineReference(JObject e, SheetData parentSheet) : base(e,parentSheet){}
     }
 }

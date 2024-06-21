@@ -1,6 +1,7 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Depot.SourceGenerator
 {
@@ -15,9 +16,9 @@ namespace Depot.SourceGenerator
             {
                 this.name = name;
             }
-            public JsonElement ToJsonElement()
+            public JObject ToJsonElement()
             {
-                return JsonDocument.Parse(JsonSerializer.Serialize(this)).RootElement;
+                return JObject.Parse(JsonConvert.SerializeObject(this));
             }
         }
         public override string GetValue(LineData configuringLine, object o)

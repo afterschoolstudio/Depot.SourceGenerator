@@ -1,11 +1,11 @@
-using System.Text.Json;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace Depot.SourceGenerator
 {
     public class LongText : Text
     {
-        public LongText(JsonElement e, SheetData parentSheet) : base(e,parentSheet){}
+        public LongText(JObject e, SheetData parentSheet) : base(e,parentSheet){}
     }
 }
