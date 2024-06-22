@@ -28,7 +28,7 @@ namespace Depot.SourceGenerator
             GUID = e["guid"].Value<string>();
             Hidden = e["hidden"].Value<bool>();
             IsProps = false; //old sheets dont have this already defined (but those sheets were also never props)
-            if(e["isProps"].HasValues)
+            if(e["isProps"] != null)
             {
                 IsProps = e["isProps"].Value<bool>();
             }

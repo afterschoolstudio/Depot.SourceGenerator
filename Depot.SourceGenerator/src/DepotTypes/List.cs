@@ -33,9 +33,8 @@ namespace Depot.SourceGenerator
                 var listValues = new List<string>();
                 var reqColumns = new List<ColumnData>(sheet.Columns);
                 //depot kvp value placement is indeterminat,so we just alphabetize here
-                foreach (var l in e.OrderBy(x => ((JProperty)x).Name)) //these are the actual values in the array
+                foreach (var prop in (e as JObject).Properties().OrderBy(x => x.Name)) //these are the actual values in the array
                 {
-                    var prop = (JProperty)l;
                     var typeColumn = sheet.Columns.Find(x => x.RawName == prop.Name);
                     if(typeColumn == null)
                     {
@@ -45,11 +44,11 @@ namespace Depot.SourceGenerator
                     }
                     if(typeColumn is Props p)
                     {
-                        listValues.Add(p.BuildPropsCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
+                        listValues.Add(p.BuildPropsCtor(configuringLine,prop.Value.ToString(),typeColumn.JObject["sheet"].Value<string>(),this));
                     }
                     else if(typeColumn is List li)
                     {
-                        listValues.Add(li.BuildListCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
+                        listValues.Add(li.BuildListCtor(configuringLine,prop.Value.ToString(),typeColumn.JObject["sheet"].Value<string>(),this));
                     }
                     else
                     {

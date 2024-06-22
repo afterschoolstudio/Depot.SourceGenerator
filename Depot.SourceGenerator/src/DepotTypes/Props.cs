@@ -26,12 +26,11 @@ namespace Depot.SourceGenerator
             var data = JObject.Parse(v);
             if(!data.HasValues){return "null";}
             var reqColumns = new List<ColumnData>(sheet.Columns);
-            foreach (var e in data.Values().OrderBy(x=>((JProperty)x).Name))
+            foreach (var prop in data.Properties().OrderBy(x=>x.Name))
             {
-                var prop = (JProperty)e;
                 if(prop.Name == "guid")
                 {
-                    values.Add(string.Format(@"""{0}""",((JProperty)e).Value));
+                    values.Add(string.Format(@"""{0}""",prop.Value.Value<string>()));
                     continue;
                 }
                 var typeColumn = sheet.Columns.Find(x => x.RawName == prop.Name);
@@ -43,15 +42,15 @@ namespace Depot.SourceGenerator
                 }
                 if(typeColumn is Props p)
                 {
-                    values.Add(p.BuildPropsCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
+                    values.Add(p.BuildPropsCtor(configuringLine,prop.Value.ToString(),typeColumn.JObject["sheet"].Value<string>(),this));
                 }
                 else if(typeColumn is List li)
                 {
-                    values.Add(li.BuildListCtor(configuringLine,prop.Value.Value<string>(),typeColumn.JObject["sheet"].Value<string>(),this));
+                    values.Add(li.BuildListCtor(configuringLine,prop.Value.ToString(),typeColumn.JObject["sheet"].Value<string>(),this));
                 }
                 else
                 {
-                    values.Add(typeColumn.GetValue(configuringLine,prop.Value.Value<string>()));
+                    values.Add(typeColumn.GetValue(configuringLine,prop.Value.Value<object>()));
                 }
                 reqColumns.Remove(typeColumn);
             }
