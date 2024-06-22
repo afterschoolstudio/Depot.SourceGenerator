@@ -157,6 +157,47 @@
                         "name": "text",
                         "description": "text"
                     }
+                },
+                {
+                    "typeStr": "grid",
+                    "guid": "578e5660-1669-49da-b594-45224d93ddc2",
+                    "name": "new grid",
+                    "description": "new grid field",
+                    "defaultValue": [
+                        true,
+                        3,
+                        "asdf",
+                        true
+                    ],
+                    "schema": [
+                        "bool",
+                        "float",
+                        "text",
+                        "bool"
+                    ],
+                    "iconName": "newGrid",
+                    "length": 4,
+                    "displayWidth": 2,
+                    "columnWidth": 50,
+                    "columnHeight": 50,
+                    "configurable": {
+                        "name": "text",
+                        "description": "text",
+                        "schema": "grid",
+                        "grid@schema": {
+                            "allowedTypes": [
+                                "int",
+                                "bool",
+                                "float",
+                                "text",
+                                "longtext",
+                                "lineReference",
+                                "sheetReference",
+                                "multiple",
+                                "enum"
+                            ]
+                        }
+                    }
                 }
             ],
             "lines": [
@@ -236,7 +277,13 @@
                     "newProps": {
                         "guid": "3692cff5-262c-4741-9691-d767b7156ede",
                         "propInt": 23
-                    }
+                    },
+                    "new grid": [
+                        true,
+                        3,
+                        "asdf",
+                        true
+                    ]
                 }
             ],
             "hidden": false,
