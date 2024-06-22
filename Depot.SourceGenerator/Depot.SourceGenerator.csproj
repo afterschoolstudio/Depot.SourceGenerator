@@ -9,7 +9,6 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <!-- <IncludeBuildOutput>false</IncludeBuildOutput> -->
 
         <RootNamespace>Depot.SourceGenerator</RootNamespace>
         <PackageId>Depot.SourceGenerator</PackageId>
@@ -25,7 +24,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.0"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.3.0"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>
 
     <ItemGroup>
@@ -34,6 +33,19 @@
 
         <!-- Package the props file -->
         <None Include="Depot.SourceGenerator.props" Pack="true" PackagePath="build" Visible="false" />
+
+        <!-- Package the Newtonsoft.Json dependency alongside the generator assembly -->
+        <None Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+    </PropertyGroup>
+
+    <Target Name="GetDependencyTargetPaths">
+        <ItemGroup>
+        <TargetPathWithTargetPlatformMoniker Include="$(PKGNewtonsoft_Json)\lib\netstandard2.0\Newtonsoft.Json.dll" IncludeRuntimeDependency="false" />
+        </ItemGroup>
+    </Target>
 
 </Project>
