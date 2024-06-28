@@ -2,19 +2,21 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <IsPackable>false</IsPackable>
+        <IsPackable>true</IsPackable>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
 
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
 
         <RootNamespace>Depot.SourceGenerator</RootNamespace>
         <PackageId>Depot.SourceGenerator</PackageId>
         <Version>1.0.5</Version>
         <Authors>Kyle Kukshtel</Authors>
         <Company>Afterschool Studio</Company>
+        <!-- <PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\..\artifacts\</PackageOutputPath> -->
     </PropertyGroup>
 
     <ItemGroup>
