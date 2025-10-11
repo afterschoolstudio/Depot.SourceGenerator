@@ -70,6 +70,11 @@ namespace Depot.SourceGenerator
                 cw.AddLine($@"public override string Name => ""{sheet.RawName}"";");
                 cw.AddLine($@"public override string Description => ""{sheet.Description}"";");
                 cw.AddLine($@"public override string GUID => ""{sheet.GUID}"";");
+                // Generate LineNames enum for top-level sheets with lines
+                if(!(sheet is SubsheetData))
+                {
+                    BuildLineNamesEnum(cw, sheet);
+                }
             }
             if(sheet.IsProps)
             {
@@ -122,6 +127,22 @@ namespace Depot.SourceGenerator
             {
                 BuildSheetLineReferenceClass(cw,sheet);
                 BuildSheetLines(cw,sheet);
+            }
+            cw.CloseScope();
+        }
+
+        static void BuildLineNamesEnum(Utils.CodeWriter cw, SheetData sheet)
+        {
+            if(sheet.Lines.Count == 0)
+            {
+                return; // Don't generate empty enum
+            }
+
+            cw.OpenScope("public enum LineName");
+            foreach (var line in sheet.Lines)
+            {
+                var comma = line == sheet.Lines.Last() ? "" : ",";
+                cw.AddLine($"{line.WriteSafeID}{comma}");
             }
             cw.CloseScope();
         }
@@ -210,7 +231,7 @@ public class {sheet.Name}LineReference
     }}
     void SetupReference()
     {{
-        Line = {sheet.Name}.Lines.Find(x => x.GUID == LineGuid);   
+        Line = {sheet.Name}.GuidDataMap[LineGuid];
     }}
 }}
 ";
@@ -260,13 +281,34 @@ public class {sheet.Name}LineReference
                     cw.AddLine(line);
                 }
 
-                cw.OpenScope($"public static List<{sheet.Name}Line> Lines = new List<{sheet.Name}Line>()");
+                cw.OpenScope($"public static List<{sheet.Name}Line> AllLines = new List<{sheet.Name}Line>()");
                 foreach (var line in sheet.Lines)
                 {
                     var c = line == sheet.Lines.Last() ? "" : ",";
                     cw.AddLine($"{line.WriteSafeID}{c}");
                 }
                 cw.CloseScope(";");
+
+                // Generate GuidDataMap
+                cw.OpenScope($"public static Dictionary<string, {sheet.Name}Line> GuidDataMap = new Dictionary<string, {sheet.Name}Line>()");
+                foreach (var line in sheet.Lines)
+                {
+                    var c = line == sheet.Lines.Last() ? "" : ",";
+                    cw.AddLine($"{{\"{line.GUID}\", {line.WriteSafeID}}}{c}");
+                }
+                cw.CloseScope(";");
+
+                // Generate LineNameDataMap (only if there are lines)
+                if(sheet.Lines.Count > 0)
+                {
+                    cw.OpenScope($"public static Dictionary<LineName, {sheet.Name}Line> LineNameDataMap = new Dictionary<LineName, {sheet.Name}Line>()");
+                    foreach (var line in sheet.Lines)
+                    {
+                        var c = line == sheet.Lines.Last() ? "" : ",";
+                        cw.AddLine($"{{LineName.{line.WriteSafeID}, {line.WriteSafeID}}}{c}");
+                    }
+                    cw.CloseScope(";");
+                }
             }
     }
 }
