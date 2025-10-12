@@ -138,7 +138,7 @@ namespace Depot.SourceGenerator
                 return; // Don't generate empty enum
             }
 
-            cw.OpenScope("public enum LineName");
+            cw.OpenScope("public enum LineNameEnum");
             foreach (var line in sheet.Lines)
             {
                 var comma = line == sheet.Lines.Last() ? "" : ",";
@@ -167,6 +167,11 @@ namespace Depot.SourceGenerator
                 lineclassname = $"{sheet.Name}Line";
             }
             cw.OpenScope($"public class {lineclassname} : DepotSheetLine");
+                // Add EnumName property for top-level sheets
+                if(!(sheet is SubsheetData) && sheet.Lines.Count > 0)
+                {
+                    cw.AddLine($"public {sheet.Name}.LineNameEnum EnumName {{get; protected set;}}");
+                }
                 foreach (var column in sheet.Columns.Where(x => !(x is Id || x is Guid)))
                 {
                     if(column is LineReference lr)
@@ -184,7 +189,21 @@ namespace Depot.SourceGenerator
                         cw.AddLine($"public {column.CSharpType} {column.Name} {{get; protected set;}}");
                     }
                 }
-                cw.OpenScope($"public {lineclassname}({String.Join(",",sheet.Columns.Select(x => $"{x.CSharpType} {x.Name}"))})");
+                // Build constructor with LineNameEnum as first parameter for top-level sheets
+                var constructorParams = "";
+                if(!(sheet is SubsheetData) && sheet.Lines.Count > 0)
+                {
+                    constructorParams = $"{sheet.Name}.LineNameEnum enumName,{String.Join(",",sheet.Columns.Select(x => $"{x.CSharpType} {x.Name}"))}";
+                }
+                else
+                {
+                    constructorParams = String.Join(",",sheet.Columns.Select(x => $"{x.CSharpType} {x.Name}"));
+                }
+                cw.OpenScope($"public {lineclassname}({constructorParams})");
+                    if(!(sheet is SubsheetData) && sheet.Lines.Count > 0)
+                    {
+                        cw.AddLine("EnumName = enumName;");
+                    }
                     cw.AddLine("ID = id;");
                     cw.AddLine("SetGuid(guid);");
                     foreach (var column in sheet.Columns.Where(x => !(x is Id || x is Guid)))
@@ -254,6 +273,11 @@ public class {sheet.Name}LineReference
                         lineValueDict.Add(token.Key,token.Value.Value<object>());
                     }
                     var lineValues = new List<string>();
+                    // Add LineNameEnum as first parameter if sheet has lines
+                    if(sheet.Lines.Count > 0)
+                    {
+                        lineValues.Add($"LineNameEnum.{line.WriteSafeID}");
+                    }
                     foreach (var item in lineValueDict.OrderBy(x=>x.Key))
                     {
                         if(item.Key == "id" || item.Key == "guid")
@@ -298,14 +322,14 @@ public class {sheet.Name}LineReference
                 }
                 cw.CloseScope(";");
 
-                // Generate LineNameDataMap (only if there are lines)
+                // Generate LineNameEnumDataMap (only if there are lines)
                 if(sheet.Lines.Count > 0)
                 {
-                    cw.OpenScope($"public static Dictionary<LineName, {sheet.Name}Line> LineNameDataMap = new Dictionary<LineName, {sheet.Name}Line>()");
+                    cw.OpenScope($"public static Dictionary<LineNameEnum, {sheet.Name}Line> LineNameEnumDataMap = new Dictionary<LineNameEnum, {sheet.Name}Line>()");
                     foreach (var line in sheet.Lines)
                     {
                         var c = line == sheet.Lines.Last() ? "" : ",";
-                        cw.AddLine($"{{LineName.{line.WriteSafeID}, {line.WriteSafeID}}}{c}");
+                        cw.AddLine($"{{LineNameEnum.{line.WriteSafeID}, {line.WriteSafeID}}}{c}");
                     }
                     cw.CloseScope(";");
                 }
