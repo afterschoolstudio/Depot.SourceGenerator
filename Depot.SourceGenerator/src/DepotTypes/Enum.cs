@@ -10,6 +10,10 @@ namespace Depot.SourceGenerator
         public override string GetValue(LineData configuringLine, object o)
         {
             var value = o.ToString();
+            if (string.IsNullOrEmpty(value))
+            {
+                return $"{ParentSheet.DataPath}.{CSharpType}.None";
+            }
             return $"{ParentSheet.DataPath}.{CSharpType}.{value}";
         }
         public Enum(JObject e, SheetData parentSheet) : base(e,parentSheet){}

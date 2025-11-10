@@ -157,47 +157,6 @@
                         "name": "text",
                         "description": "text"
                     }
-                },
-                {
-                    "typeStr": "grid",
-                    "guid": "578e5660-1669-49da-b594-45224d93ddc2",
-                    "name": "new grid",
-                    "description": "new grid field",
-                    "defaultValue": [
-                        true,
-                        3,
-                        "asdf",
-                        true
-                    ],
-                    "schema": [
-                        "bool",
-                        "float",
-                        "text",
-                        "bool"
-                    ],
-                    "iconName": "newGrid",
-                    "length": 4,
-                    "displayWidth": 2,
-                    "columnWidth": 50,
-                    "columnHeight": 50,
-                    "configurable": {
-                        "name": "text",
-                        "description": "text",
-                        "schema": "grid",
-                        "grid@schema": {
-                            "allowedTypes": [
-                                "int",
-                                "bool",
-                                "float",
-                                "text",
-                                "longtext",
-                                "lineReference",
-                                "sheetReference",
-                                "multiple",
-                                "enum"
-                            ]
-                        }
-                    }
                 }
             ],
             "lines": [
@@ -219,71 +178,34 @@
                         {
                             "guid": "2b9b423f-bb58-445c-81a1-c4fef321a559",
                             "listInt": 42,
-                            "id": "0",
-                            "listProps": {
-                                "guid": "830efcf5-17b6-4682-9646-96dcb3450f5a",
-                                "listPropsInt": 2,
-                                "deepList": [
-                                    {
-                                        "guid": "96542c3f-99d5-480d-9d18-6eed7c39c10f",
-                                        "id": "0",
-                                        "deepBool": true
-                                    },
-                                    {
-                                        "guid": "51b2a96d-8bb7-48bd-b259-38cf40b0202b",
-                                        "id": "1",
-                                        "deepBool": false
-                                    },
-                                    {
-                                        "guid": "0c77cc4b-84cb-4c59-a4a4-d9cb40bc575c",
-                                        "id": "2",
-                                        "deepBool": false
-                                    }
-                                ]
-                            }
+                            "id": "0"
                         },
                         {
                             "guid": "7ff200e0-0239-4699-b584-e74889b786ff",
                             "listInt": 84,
-                            "id": "1",
-                            "listProps": {
-                                "guid": "6176bada-faab-4436-a7c3-d19246c007d8",
-                                "listPropsInt": 5,
-                                "deepList": [
-                                    {
-                                        "guid": "52c5e483-41ac-496d-bc25-809e93f4943d",
-                                        "id": "a",
-                                        "deepBool": false
-                                    },
-                                    {
-                                        "guid": "58901d2b-dd12-44d1-b47a-8084829dcda4",
-                                        "id": "b",
-                                        "deepBool": false
-                                    },
-                                    {
-                                        "guid": "d4797134-b3cc-4bef-8341-4256168a044b",
-                                        "id": "c",
-                                        "deepBool": false
-                                    },
-                                    {
-                                        "guid": "93b059e0-c7ca-408f-9731-c1446500dcde",
-                                        "id": "d",
-                                        "deepBool": true
-                                    }
-                                ]
-                            }
+                            "id": "1"
                         }
                     ],
                     "newProps": {
                         "guid": "3692cff5-262c-4741-9691-d767b7156ede",
                         "propInt": 23
-                    },
-                    "new grid": [
-                        true,
-                        3,
-                        "asdf",
-                        true
-                    ]
+                    }
+                },
+                {
+                    "guid": "8ab721a4-64c9-4d2f-acf0-5090a333675c",
+                    "id": "1",
+                    "newInt": 0,
+                    "newFloat": 0,
+                    "newBool": true,
+                    "newText": "some test",
+                    "newFile": "",
+                    "newEnum": "",
+                    "newMultiple": [
+                        "a"
+                    ],
+                    "newLineReference": "048d3f3f-22b5-4af7-b599-7972735a5ab5",
+                    "new list": [],
+                    "newProps": {}
                 }
             ],
             "hidden": false,
@@ -367,19 +289,6 @@
                         "max": "int",
                         "defaultValue": "int"
                     }
-                },
-                {
-                    "typeStr": "props",
-                    "guid": "f6b90529-f77e-4434-8e04-80706d82e531",
-                    "name": "listProps",
-                    "description": "new properties field",
-                    "sheet": "f4af3f11-cc0a-4f5a-8ea4-7caf103fc3e4",
-                    "defaultValue": {},
-                    "iconName": "newProps",
-                    "configurable": {
-                        "name": "text",
-                        "description": "text"
-                    }
                 }
             ],
             "lines": [],
@@ -417,75 +326,6 @@
             "isProps": true,
             "parentSheetGUID": "b06637c6-2cca-42da-b7c3-b4bf06041d1b",
             "columnGUID": "f1ca973b-d3e0-4680-8c78-b4a852e2b4bb"
-        },
-        {
-            "name": "listProps",
-            "description": "props@0548c568-3d08-4c48-8c0a-2ab3fd63ae70",
-            "displayColumn": "id",
-            "guid": "f4af3f11-cc0a-4f5a-8ea4-7caf103fc3e4",
-            "columns": [
-                {
-                    "typeStr": "int",
-                    "guid": "b5c69e79-7ac0-4b06-bba0-f47fe84fa4b2",
-                    "description": "int field",
-                    "name": "listPropsInt",
-                    "min": -10000,
-                    "max": 100000,
-                    "defaultValue": 0,
-                    "iconName": "newInt",
-                    "configurable": {
-                        "name": "text",
-                        "description": "text",
-                        "min": "int",
-                        "max": "int",
-                        "defaultValue": "int"
-                    }
-                },
-                {
-                    "typeStr": "list",
-                    "guid": "2d328ca2-c8c7-42c8-8a7e-484032a3f0b3",
-                    "name": "deepList",
-                    "description": "new list field",
-                    "sheet": "5a35e361-4ff8-41e1-b5fd-643ae84c1f44",
-                    "defaultValue": [],
-                    "iconName": "newList",
-                    "configurable": {
-                        "name": "text",
-                        "description": "text"
-                    }
-                }
-            ],
-            "lines": [],
-            "hidden": true,
-            "isProps": true,
-            "parentSheetGUID": "0548c568-3d08-4c48-8c0a-2ab3fd63ae70",
-            "columnGUID": "f6b90529-f77e-4434-8e04-80706d82e531"
-        },
-        {
-            "name": "deepList",
-            "description": "list@f4af3f11-cc0a-4f5a-8ea4-7caf103fc3e4",
-            "displayColumn": "id",
-            "guid": "5a35e361-4ff8-41e1-b5fd-643ae84c1f44",
-            "columns": [
-                {
-                    "typeStr": "bool",
-                    "guid": "a55ecdcc-bd98-45b8-b65c-de8220be925f",
-                    "description": "bool field",
-                    "name": "deepBool",
-                    "defaultValue": true,
-                    "iconName": "newBool",
-                    "configurable": {
-                        "name": "text",
-                        "description": "text",
-                        "defaultValue": "bool"
-                    }
-                }
-            ],
-            "lines": [],
-            "hidden": true,
-            "isProps": false,
-            "parentSheetGUID": "f4af3f11-cc0a-4f5a-8ea4-7caf103fc3e4",
-            "columnGUID": "2d328ca2-c8c7-42c8-8a7e-484032a3f0b3"
         }
     ]
 }

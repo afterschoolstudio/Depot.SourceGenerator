@@ -1,7 +1,7 @@
 ﻿Console.WriteLine("Hello, World!");
 
 // Test the renamed LineNameEnum
-var lineNameEnum = Depot.Generated.test.newSheet.LineNameEnum.me;
+var lineNameEnum = Depot.Generated.test.newSheet.LineNameEnum._0;
 Console.WriteLine($"Line name enum value: {lineNameEnum}");
 
 // Test AllLines (renamed from Lines)
@@ -13,5 +13,5 @@ var lineFromGuidMap = Depot.Generated.test.newSheet.GuidDataMap[firstLine.GUID];
 Console.WriteLine($"Found line by GUID: {lineFromGuidMap.ID}");
 
 // Test LineNameEnumDataMap
-var lineFromNameMap = Depot.Generated.test.newSheet.LineNameEnumDataMap[Depot.Generated.test.newSheet.LineNameEnum.me];
+var lineFromNameMap = Depot.Generated.test.newSheet.LineNameEnumDataMap[Depot.Generated.test.newSheet.LineNameEnum._0];
 Console.WriteLine($"Found line by name enum: {lineFromNameMap.ID}");
