@@ -10,10 +10,14 @@
         <IsRoslynComponent>true</IsRoslynComponent>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <IncludeBuildOutput>false</IncludeBuildOutput>
+        <!-- Analyzer-only package: the compiler supplies Roslyn when it loads the generator. Without
+             this the Roslyn references become package dependencies, and every consuming project ships
+             the Roslyn assemblies in its output. Newtonsoft.Json is bundled in analyzers/ instead. -->
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
         <RootNamespace>Depot.SourceGenerator</RootNamespace>
         <PackageId>Depot.SourceGenerator</PackageId>
-        <Version>1.1.0</Version>
+        <Version>1.1.1</Version>
         <Authors>Kyle Kukshtel</Authors>
         <Company>Afterschool Studio</Company>
         <!-- <PackageOutputPath>$(MSBuildThisFileDirectory)..\..\..\..\..\artifacts\</PackageOutputPath> -->
